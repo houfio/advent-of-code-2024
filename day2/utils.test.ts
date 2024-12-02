@@ -14,4 +14,8 @@ describe('calculateSafe', () => {
   test('calculates correct safe number', () => {
     expect(calculateSafe(input)).toBe(2);
   });
+
+  test('calculates correct safe number with dampener', () => {
+    expect(calculateSafe(input, true)).toBe(4);
+  });
 })
