@@ -8,17 +8,43 @@ export async function readInput(name: string) {
   return lines.map((line) => line.split(/\s+/).map(Number));
 }
 
-export function calculateSafe(input: number[][]) {
-  const safe = input.filter((data) => {
-    const compare = (fn: (a: number, b: number) => boolean) =>
-      data.every((value, index) => !index || fn(value, data[index - 1]));
+export function calculateSafe(input: number[][], dampener = false) {
+  const isSafe = (data: number[]) => {
+    let increasing = true;
+    let decreasing = true;
+    let jump = true;
 
-    if (!compare((a, b) => a > b) && !compare((a, b) => a < b)) {
-      return false;
+    for (let i = 1; i < data.length; i++) {
+      const current = data[i];
+      const previous = data[i - 1];
+
+      increasing &&= current > previous;
+      decreasing &&= current < previous;
+      jump &&= Math.abs(current - previous) < 4;
+
+      if ((!increasing && !decreasing) || !jump) {
+        return false;
+      }
     }
 
-    return compare((a, b) => Math.abs(a - b) < 4);
+    return true;
+  }
+
+  const filtered = input.filter((data) => {
+    if (isSafe(data)) {
+      return true;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      const sliced = [...data.slice(0, i), ...data.slice(i + 1, data.length)];
+
+      if (isSafe(sliced) && dampener) {
+        return true;
+      }
+    }
+
+    return false;
   });
 
-  return safe.length;
+  return filtered.length;
 }
