@@ -7,6 +7,6 @@ describe('multiplyMemory', () => {
   });
 
   test('multiplies correct numbers with conditionals', () => {
-    expect(multiplyMemory('xmul(2,4)&mul[3,7]!^don\'t()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))', true)).toBe(48);
+    expect(multiplyMemory("xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))", true)).toBe(48);
   });
-})
+});

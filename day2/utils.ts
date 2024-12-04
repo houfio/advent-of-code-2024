@@ -28,7 +28,7 @@ export function calculateSafe(input: number[][], dampener = false) {
     }
 
     return true;
-  }
+  };
 
   const filtered = input.filter((data) => {
     if (isSafe(data)) {
