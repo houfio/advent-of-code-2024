@@ -9,7 +9,7 @@ export async function readInput(name: string) {
 
 export function searchWord(input: string[], word: string) {
   const length = word.length;
-  const grid: [string, number][][] = input.map((line) => line.split('').map((character) => [character, 0]));
+  const grid = input.map((line) => line.split(''));
   const width = grid[0].length;
   const height = grid.length;
 
@@ -23,33 +23,16 @@ export function searchWord(input: string[], word: string) {
       return false;
     }
 
-    const coords = Array(length)
-      .fill(undefined)
-      .map((_, i) => {
-        const currentX = axis !== 'y' ? x + (backwards ? -i : i) : x;
-        const currentY = axis !== 'x' ? y + ((axis === 'y' && backwards) || axis === 'u' ? -i : i) : y;
+    for (let i = 0; i < length; i++) {
+      const currentX = axis !== 'y' ? x + (backwards ? -i : i) : x;
+      const currentY = axis !== 'x' ? y + ((axis === 'y' && backwards) || axis === 'u' ? -i : i) : y;
 
-        return [i, currentX, currentY] as const;
-      });
-    let unfound = false;
-
-    for (const [i, currentX, currentY] of coords) {
-      const entry = grid[currentY][currentX];
-
-      if (entry[0] !== word[i]) {
+      if (grid[currentY][currentX] !== word[i]) {
         return false;
       }
-
-      unfound ||= !entry[1];
     }
 
-    if (unfound) {
-      for (const [, currentX, currentY] of coords) {
-        grid[currentY][currentX][1]++;
-      }
-    }
-
-    return unfound;
+    return true;
   };
 
   let result = 0;
