@@ -14,20 +14,11 @@ export function searchWord(input: string[], word: string) {
   const height = grid.length;
 
   const search = (x: number, y: number, axis: string, backwards: boolean) => {
-    const minX = axis !== 'y' && backwards ? x - (length - 1) : x;
-    const maxX = axis !== 'y' && !backwards ? x + (length - 1) : x;
-    const minY = axis === 'u' || (axis === 'y' && backwards) ? y - (length - 1) : y;
-    const maxY = axis === 'd' || (axis === 'y' && !backwards) ? y + (length - 1) : y;
-
-    if (minX < 0 || maxX >= width || minY < 0 || maxY >= height) {
-      return false;
-    }
-
     for (let i = 0; i < length; i++) {
       const currentX = axis !== 'y' ? x + (backwards ? -i : i) : x;
       const currentY = axis !== 'x' ? y + ((axis === 'y' && backwards) || axis === 'u' ? -i : i) : y;
 
-      if (grid[currentY][currentX] !== word[i]) {
+      if (grid[currentY]?.[currentX] !== word[i]) {
         return false;
       }
     }
