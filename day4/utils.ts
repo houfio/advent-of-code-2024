@@ -26,58 +26,45 @@ function makeGrid(input: string[], word: string) {
     return true;
   };
 
-  return [grid, width, height, search] as const;
+  const sumForEach = (fn: (x: number, y: number) => number) =>
+    Array(width * height)
+      .fill(undefined)
+      .reduce((previous, _, index) => previous + fn(index % width, Math.floor(index / width)), 0);
+
+  return [sumForEach, search] as const;
 }
 
 export function searchWord(input: string[], word: string) {
-  const [grid, width, height, search] = makeGrid(input, word);
-  let result = 0;
+  const [sumForEach, search] = makeGrid(input, word);
 
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      if (word.indexOf(grid[y][x][0])) {
-        continue;
-      }
+  return sumForEach((x, y) => {
+    const results = [
+      search(x, y, 'x', false),
+      search(x, y, 'x', true),
+      search(x, y, 'y', false),
+      search(x, y, 'y', true),
+      search(x, y, 'u', false),
+      search(x, y, 'u', true),
+      search(x, y, 'd', false),
+      search(x, y, 'd', true)
+    ].filter(Boolean);
 
-      const results = [
-        search(x, y, 'x', false),
-        search(x, y, 'x', true),
-        search(x, y, 'y', false),
-        search(x, y, 'y', true),
-        search(x, y, 'u', false),
-        search(x, y, 'u', true),
-        search(x, y, 'd', false),
-        search(x, y, 'd', true)
-      ].filter(Boolean);
-
-      result += results.length;
-    }
-  }
-
-  return result;
+    return results.length;
+  });
 }
 
 export function searchXmark(input: string[], word: string) {
-  const [grid, width, height, search] = makeGrid(input, word);
+  const [sumForEach, search] = makeGrid(input, word);
   const middle = Math.floor(word.length / 2);
-  let result = 0;
 
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
-      if (grid[y][x][0] !== word[middle]) {
-        continue;
-      }
+  return sumForEach((x, y) => {
+    const results = [
+      search(x - middle, y + middle, 'u', false),
+      search(x + middle, y + middle, 'u', true),
+      search(x - middle, y - middle, 'd', false),
+      search(x + middle, y - middle, 'd', true)
+    ].filter(Boolean);
 
-      const results = [
-        search(x - middle, y + middle, 'u', false),
-        search(x + middle, y + middle, 'u', true),
-        search(x - middle, y - middle, 'd', false),
-        search(x + middle, y - middle, 'd', true)
-      ].filter(Boolean);
-
-      result += results.length > 1 ? 1 : 0;
-    }
-  }
-
-  return result;
+    return results.length > 1 ? 1 : 0;
+  });
 }
