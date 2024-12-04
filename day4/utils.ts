@@ -29,7 +29,7 @@ function makeGrid(input: string[], word: string) {
   const sumForEach = (fn: (x: number, y: number) => number) =>
     Array(width * height)
       .fill(undefined)
-      .reduce((previous, _, index) => previous + fn(index % width, Math.floor(index / width)), 0);
+      .reduce<number>((previous, _, index) => previous + fn(index % width, Math.floor(index / width)), 0);
 
   return [sumForEach, search] as const;
 }
