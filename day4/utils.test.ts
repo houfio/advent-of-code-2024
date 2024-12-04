@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { searchWord } from './utils.ts';
+import { searchWord, searchXmark } from './utils.ts';
 
 const input = [
   'MMMSXXMASM',
@@ -17,5 +17,11 @@ const input = [
 describe('searchWord', () => {
   test('finds the correct number of words', () => {
     expect(searchWord(input, 'XMAS')).toBe(18);
+  });
+});
+
+describe('searchXmark', () => {
+  test('finds the correct number of x marks', () => {
+    expect(searchXmark(input, 'MAS')).toBe(9);
   });
 });
