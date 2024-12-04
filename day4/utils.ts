@@ -7,7 +7,7 @@ export async function readInput(name: string) {
   return text.split(/\r?\n/).filter(Boolean);
 }
 
-export function searchWord(input: string[], word: string) {
+function makeGrid(input: string[], word: string) {
   const length = word.length;
   const grid = input.map((line) => line.split(''));
   const width = grid[0].length;
@@ -26,6 +26,11 @@ export function searchWord(input: string[], word: string) {
     return true;
   };
 
+  return [grid, width, height, search] as const;
+}
+
+export function searchWord(input: string[], word: string) {
+  const [grid, width, height, search] = makeGrid(input, word);
   let result = 0;
 
   for (let x = 0; x < width; x++) {
@@ -46,6 +51,31 @@ export function searchWord(input: string[], word: string) {
       ].filter(Boolean);
 
       result += results.length;
+    }
+  }
+
+  return result;
+}
+
+export function searchXmark(input: string[], word: string) {
+  const [grid, width, height, search] = makeGrid(input, word);
+  const middle = Math.floor(word.length / 2);
+  let result = 0;
+
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+      if (grid[y][x][0] !== word[middle]) {
+        continue;
+      }
+
+      const results = [
+        search(x - middle, y + middle, 'u', false),
+        search(x + middle, y + middle, 'u', true),
+        search(x - middle, y - middle, 'd', false),
+        search(x + middle, y - middle, 'd', true)
+      ].filter(Boolean);
+
+      result += results.length > 1 ? 1 : 0;
     }
   }
 
