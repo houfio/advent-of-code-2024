@@ -3,25 +3,10 @@ import { file } from 'bun';
 export async function readInput(name: string) {
   const input = file(name);
   const text = await input.text();
-  const rules: number[][] = [];
-  const lines: number[][] = [];
-  let halfway = false;
-
-  for (const line of text.split(/\r?\n/)) {
-    if (!line) {
-      halfway = true;
-
-      continue;
-    }
-
-    if (!halfway) {
-      const [a, b] = line.split('|');
-
-      rules.push([Number(a), Number(b)]);
-    } else {
-      lines.push(line.split(',').map(Number));
-    }
-  }
+  const split = text.split(/\r?\n/);
+  const halfway = split.indexOf('');
+  const rules = split.slice(0, halfway).map((line) => line.split('|').map(Number));
+  const lines = split.slice(halfway + 1).map((line) => line.split(',').map(Number));
 
   return [rules, lines] as const;
 }
