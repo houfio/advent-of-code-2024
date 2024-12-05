@@ -59,10 +59,10 @@ export function findAndFixInvalid(rules: number[][], lines: number[][]) {
     }
 
     while (invalid.length) {
-      for (const [a] of invalid) {
-        const indexA = line.indexOf(a);
+      for (const [n] of invalid) {
+        const index = line.indexOf(n);
 
-        line = [a, ...line.slice(0, indexA), ...line.slice(indexA + 1)];
+        line = [n, ...line.slice(0, index), ...line.slice(index + 1)];
       }
 
       invalid = getInvalid(line);
