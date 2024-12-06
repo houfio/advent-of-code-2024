@@ -18,18 +18,15 @@ function followPath(start: string, grid: (string | number)[][]) {
   let y = grid.findIndex((line) => line.includes(start));
   let x = grid[y].indexOf(start);
   let direction = 0;
-  let iteration = 0;
   let nextTile: string | number;
   let walked = 0;
 
   do {
-    if (iteration++ > grid.length * grid[0].length) {
-      return;
-    }
-
-    if (grid[y][x] !== 'X') {
+    if (typeof grid[y][x] !== 'number') {
       walked++;
-      grid[y][x] = 'X';
+      grid[y][x] = direction;
+    } else if (grid[y][x] === direction) {
+      return;
     }
 
     const [offsetX, offsetY] = directions[direction];
