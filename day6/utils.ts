@@ -14,19 +14,15 @@ const directions = [
   [-1, 0]
 ];
 
-function makeGrid(input: string[]) {
-  return input.map((line) => line.split(''));
-}
-
-function followPath(grid: string[][]) {
-  let y = grid.findIndex((line) => line.includes('^'));
-  let x = grid[y].indexOf('^');
+function followPath(start: string, grid: string[][]) {
+  let y = grid.findIndex((line) => line.includes(start));
+  let x = grid[y].indexOf(start);
   let direction = 0;
+  let iteration = 0;
   let nextTile: string;
-  let iter = 0;
 
   do {
-    if (iter++ > grid.length * grid[0].length) {
+    if (iteration++ > grid.length * grid[0].length) {
       return;
     }
 
@@ -42,17 +38,20 @@ function followPath(grid: string[][]) {
       x += offsetX;
       y += offsetY;
     }
-  } while (nextTile !== undefined);
+  } while (nextTile);
 
-  return grid.reduce((previous, current) => previous + current.reduce((p, c) => p + (c === 'X' ? 1 : 0), 0), 0);
+  return grid.reduce((previous, current) => previous + current.filter((tile) => tile === 'X').length, 0);
 }
 
 export function calculateVisited(input: string[]) {
-  return followPath(makeGrid(input));
+  return followPath(
+    '^',
+    input.map((line) => line.split(''))
+  );
 }
 
 export function calculateLoops(input: string[]) {
-  const grid = makeGrid(input);
+  const grid = input.map((line) => line.split(''));
   let result = 0;
 
   for (let y = 0; y < grid.length; y++) {
@@ -65,7 +64,7 @@ export function calculateLoops(input: string[]) {
 
       newGrid[y][x] = '#';
 
-      if (!followPath(newGrid)) {
+      if (!followPath('^', newGrid)) {
         result++;
       }
     }
