@@ -14,19 +14,23 @@ const directions = [
   [-1, 0]
 ];
 
-function followPath(start: string, grid: string[][]) {
+function followPath(start: string, grid: (string | number)[][]) {
   let y = grid.findIndex((line) => line.includes(start));
   let x = grid[y].indexOf(start);
   let direction = 0;
   let iteration = 0;
-  let nextTile: string;
+  let nextTile: string | number;
+  let walked = 0;
 
   do {
     if (iteration++ > grid.length * grid[0].length) {
       return;
     }
 
-    grid[y][x] = 'X';
+    if (grid[y][x] !== 'X') {
+      walked++;
+      grid[y][x] = 'X';
+    }
 
     const [offsetX, offsetY] = directions[direction];
 
@@ -38,9 +42,9 @@ function followPath(start: string, grid: string[][]) {
       x += offsetX;
       y += offsetY;
     }
-  } while (nextTile);
+  } while (nextTile !== undefined);
 
-  return grid.reduce((previous, current) => previous + current.filter((tile) => tile === 'X').length, 0);
+  return walked;
 }
 
 export function calculateVisited(input: string[]) {
