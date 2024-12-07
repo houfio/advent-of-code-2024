@@ -10,7 +10,11 @@ export async function readInput(name: string) {
 
 type Operator = (a: number, b: number) => number;
 
-const operators: Operator[] = [(a, b) => a + b, (a, b) => a * b, (a, b) => Number(`${a}${b}`)];
+const operators: Operator[] = [
+  (a, b) => a + b,
+  (a, b) => a * b,
+  (a, b) => a * 10 ** (Math.floor(Math.log10(b)) + 1) + b
+];
 
 function isValid(result: number, input: number[], ops: Operator[]) {
   const backtrack = (index: number, current: number) => {
