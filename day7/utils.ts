@@ -13,23 +13,21 @@ type Operator = (a: number, b: number) => number;
 const operators: Operator[] = [(a, b) => a + b, (a, b) => a * b, (a, b) => Number(`${a}${b}`)];
 
 function isValid(result: number, input: number[], ops: Operator[]) {
-  for (let i = 0; i < ops.length ** (input.length - 1); i++) {
-    let offset = i;
-
-    const calculation = input.slice(1).reduce((previous, current) => {
-      const op = offset % ops.length;
-
-      offset = Math.floor(offset / ops.length);
-
-      return ops[op](previous, current);
-    }, input[0]);
-
-    if (calculation === result) {
-      return true;
+  const backtrack = (index: number, current: number) => {
+    if (index === input.length) {
+      return current === result;
     }
-  }
 
-  return false;
+    for (const op of ops) {
+      if (backtrack(index + 1, op(current, input[index]))) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  return backtrack(1, input[0]);
 }
 
 export function calculateValid(input: number[][], concat = false) {
