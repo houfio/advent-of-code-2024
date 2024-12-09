@@ -40,7 +40,7 @@ export function fragment(input: number[]) {
 
 export function fragmentByFile(input: number[]) {
   const spaced = spaceData(input);
-  const result = spaced.slice();
+  const result = [...spaced];
 
   for (let i = spaced.length - 1, ii = input.length - 1; i >= 0; i -= input[ii--]) {
     const value = spaced[i];
@@ -50,13 +50,25 @@ export function fragmentByFile(input: number[]) {
       continue;
     }
 
-    const target = spaced.findIndex(
-      (data, index) => !data && result.slice(index, index + length).every((v) => v === null)
-    );
+    const target = spaced.findIndex((data, index) => {
+      if (!data) {
+        return false;
+      }
+
+      for (let iii = 0; iii < length; iii++) {
+        if (result[index + iii] !== null) {
+          return false;
+        }
+      }
+
+      return true;
+    });
 
     if (target >= 0 && target < i) {
-      result.splice(target, length, ...result.slice(i - length + 1, i + 1));
-      result.splice(i - length + 1, length, ...Array(length).fill(null));
+      for (let iii = 0; iii < length; iii++) {
+        result[target + iii] = value;
+        result[i - length + 1 + iii] = null;
+      }
     }
   }
 
