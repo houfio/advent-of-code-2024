@@ -9,48 +9,19 @@ export async function readInput(name: string) {
 
 type Data = number | null;
 
-function spaceData(input: number[]) {
-  return input.flatMap<Data>((value, index) => Array(value).fill(index % 2 ? null : index / 2));
-}
-
-function calculateChecksum(input: Data[]) {
-  return input.reduce<number>((previous, current, index) => previous + (current ?? 0) * index, 0);
-}
-
-export function fragment(input: number[]) {
-  const spaced = spaceData(input);
-
-  for (let i = 0; i < spaced.length; i++) {
-    if (spaced[i] !== null) {
-      continue;
-    }
-
-    const last = spaced.findLastIndex((v) => v !== null);
-
-    if (last <= i) {
-      break;
-    }
-
-    spaced[i] = spaced[last];
-    spaced[last] = null;
-  }
-
-  return calculateChecksum(spaced);
-}
-
-export function fragmentByFile(input: number[]) {
-  const spaced = spaceData(input);
+export function fragment(input: number[], file = false) {
+  const spaced = input.flatMap<Data>((value, index) => Array(value).fill(index % 2 ? null : index / 2));
   const result = [...spaced];
 
-  for (let i = spaced.length - 1, ii = input.length - 1; i >= 0; i -= input[ii--]) {
+  for (let i = spaced.length - 1, ii = input.length - 1; i >= 0; i -= file ? input[ii] : 1, ii--) {
     const value = spaced[i];
-    const length = input[ii];
+    const length = file ? input[ii] : 1;
 
     if (value === null || !length) {
       continue;
     }
 
-    const target = spaced.findIndex((data, index) => {
+    const target = result.findIndex((data, index) => {
       if (data) {
         return false;
       }
@@ -64,6 +35,10 @@ export function fragmentByFile(input: number[]) {
       return true;
     });
 
+    if (!file && target >= i) {
+      break;
+    }
+
     if (target >= 0 && target < i) {
       for (let iii = 0; iii < length; iii++) {
         result[target + iii] = value;
@@ -72,5 +47,5 @@ export function fragmentByFile(input: number[]) {
     }
   }
 
-  return calculateChecksum(result);
+  return result.reduce<number>((previous, current, index) => previous + (current ?? 0) * index, 0);
 }
