@@ -51,7 +51,7 @@ export function fragmentByFile(input: number[]) {
     }
 
     const target = spaced.findIndex((data, index) => {
-      if (!data) {
+      if (data) {
         return false;
       }
 
