@@ -1,11 +1,4 @@
-import { file } from 'bun';
-
-export async function readInput(name: string) {
-  const input = file(name);
-  const text = await input.text();
-
-  return text.split(/\r?\n/).filter(Boolean);
-}
+import { readGrid, run } from '../utils.ts';
 
 const directions = [
   [0, -1],
@@ -44,24 +37,25 @@ function followPath(start: string, grid: (string | number)[][]) {
   return walked;
 }
 
-export function calculateVisited(input: string[]) {
-  return followPath(
-    '^',
-    input.map((line) => line.split(''))
+function calculateVisited(input: string[][]) {
+  return (
+    followPath(
+      '^',
+      input.map((row) => row.slice())
+    ) ?? 0
   );
 }
 
-export function calculateLoops(input: string[]) {
-  const grid = input.map((line) => line.split(''));
+function calculateLoops(input: string[][]) {
   let result = 0;
 
-  for (let y = 0; y < grid.length; y++) {
-    for (let x = 0; x < grid[y].length; x++) {
-      if (grid[y][x] !== '.') {
+  for (let y = 0; y < input.length; y++) {
+    for (let x = 0; x < input[y].length; x++) {
+      if (input[y][x] !== '.') {
         continue;
       }
 
-      const newGrid = grid.map((row) => row.slice());
+      const newGrid = input.map((row) => row.slice());
 
       newGrid[y][x] = '#';
 
@@ -73,3 +67,5 @@ export function calculateLoops(input: string[]) {
 
   return result;
 }
+
+await run(readGrid, [calculateVisited, calculateLoops]);

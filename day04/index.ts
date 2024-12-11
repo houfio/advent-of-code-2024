@@ -1,11 +1,4 @@
-import { file } from 'bun';
-
-export async function readInput(name: string) {
-  const input = file(name);
-  const text = await input.text();
-
-  return text.split(/\r?\n/).filter(Boolean);
-}
+import { readLines, run } from '../utils.ts';
 
 function makeGrid(input: string[], word: string) {
   const length = word.length;
@@ -34,8 +27,8 @@ function makeGrid(input: string[], word: string) {
   return [sumForEach, search] as const;
 }
 
-export function searchWord(input: string[], word: string) {
-  const [sumForEach, search] = makeGrid(input, word);
+function searchWord(input: string[]) {
+  const [sumForEach, search] = makeGrid(input, 'XMAS');
 
   return sumForEach((x, y) => {
     const results = [
@@ -53,18 +46,19 @@ export function searchWord(input: string[], word: string) {
   });
 }
 
-export function searchXmark(input: string[], word: string) {
-  const [sumForEach, search] = makeGrid(input, word);
-  const middle = Math.floor(word.length / 2);
+function searchXmark(input: string[]) {
+  const [sumForEach, search] = makeGrid(input, 'MAS');
 
   return sumForEach((x, y) => {
     const results = [
-      search(x - middle, y + middle, 'u', false),
-      search(x + middle, y + middle, 'u', true),
-      search(x - middle, y - middle, 'd', false),
-      search(x + middle, y - middle, 'd', true)
+      search(x - 1, y + 1, 'u', false),
+      search(x + 1, y + 1, 'u', true),
+      search(x - 1, y - 1, 'd', false),
+      search(x + 1, y - 1, 'd', true)
     ].filter(Boolean);
 
     return results.length > 1 ? 1 : 0;
   });
 }
+
+await run(readLines, [searchWord, searchXmark]);
