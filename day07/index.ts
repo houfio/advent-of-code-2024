@@ -1,12 +1,4 @@
-import { file } from 'bun';
-
-export async function readInput(name: string) {
-  const input = file(name);
-  const text = await input.text();
-  const lines = text.split(/\r?\n/).filter(Boolean);
-
-  return lines.map((line) => line.split(/ |: /g).map(Number));
-}
+import { readNumberGrid, run } from '../utils.ts';
 
 type Operator = (a: number, b: number) => number;
 
@@ -34,10 +26,14 @@ function isValid(result: number, input: number[], ops: Operator[]) {
   return backtrack(1, input[0]);
 }
 
-export function calculateValid(input: number[][], concat = false) {
-  const ops = operators.slice(0, operators.length - (concat ? 0 : 1));
+function calculateValid(concat: boolean) {
+  return (input: number[][]) => {
+    const ops = operators.slice(0, operators.length - (concat ? 0 : 1));
 
-  return input
-    .filter(([result, ...i]) => isValid(result, i, ops))
-    .reduce((previous, current) => previous + current[0], 0);
+    return input
+      .filter(([result, ...i]) => isValid(result, i, ops))
+      .reduce((previous, current) => previous + current[0], 0);
+  };
 }
+
+await run(() => readNumberGrid(/ |: /), [calculateValid(false), calculateValid(true)]);
