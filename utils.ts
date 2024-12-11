@@ -51,8 +51,8 @@ function bench() {
 }
 
 export async function readText() {
-  const path = `${Bun.main}/input${test ? '-test' : ''}.txt`;
-  const file = Bun.file(path);
+  const path = Bun.main.includes('.') ? Bun.main.slice(0, Bun.main.lastIndexOf('/')) : Bun.main;
+  const file = Bun.file(`${path}/input${test ? '-test' : ''}.txt`);
   const text = await file.text();
 
   return text.trim();
