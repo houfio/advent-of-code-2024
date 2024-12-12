@@ -6,7 +6,7 @@ while (true) {
   const path = `./day${String(++day).padStart(2, '0')}/index.ts`;
   const file = Bun.file(path);
 
-  if (!await file.exists()) {
+  if (!(await file.exists())) {
     break;
   }
 
