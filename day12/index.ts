@@ -32,30 +32,32 @@ function countSides(distinct: boolean) {
 
       visited.add(key);
 
-      const next = directions.map((d) => backtrack(x + d[0], y + d[1], wanted, [...parents, [x, y]]));
+      const next = directions.map(([oX, oY]) => backtrack(x + oX, y + oY, wanted, [...parents, [x, y]]));
       const area = next.reduce((previous, current) => previous + current[0], 0);
       const edges = next.reduce((previous, current) => previous + current[1], 0);
+      const found = corners.filter((corner) => {
+        if (!distinct) {
+          return false;
+        }
 
-      const found = !distinct
-        ? []
-        : corners.filter((corner) => {
-            const horizontal = directions[corner[0]];
-            const vertical = directions[corner[1]];
-            const positions: Position[] = [
-              [x + horizontal[0], y + vertical[1]],
-              [x + horizontal[0], y + horizontal[1]],
-              [x + vertical[0], y + vertical[1]]
-            ];
-            const seen = positions.map((pos) => parents.some((parent) => parent[0] === pos[0] && parent[1] === pos[1]));
-            const matches = positions.map((pos) => input[pos[1]]?.[pos[0]] === wanted);
-            const matchesCount = matches.filter(Boolean).length;
+        const [hX, hY] = directions[corner[0]];
+        const [vX, vY] = directions[corner[1]];
+        const adjacent = [
+          [x + hX, y + vY],
+          [x + hX, y + hY],
+          [x + vX, y + vY]
+        ].map(([aX, aY]) => ({
+          seen: parents.some(([pX, pY]) => pX === aX && pY === aY),
+          matches: input[aY]?.[aX] === wanted
+        }));
+        const sameGroup = adjacent.filter((tile) => tile.matches).length;
 
-            if (matchesCount === 0 || matchesCount === 2) {
-              return !seen.some(Boolean);
-            }
+        if (sameGroup === 0 || sameGroup === 2) {
+          return !adjacent.some((tile) => tile.seen);
+        }
 
-            return matches[0] && !matches[1] && !matches[1];
-          });
+        return adjacent[0].matches && !adjacent[1].matches && !adjacent[1].matches;
+      });
 
       return [area + 1, edges + found.length];
     };
