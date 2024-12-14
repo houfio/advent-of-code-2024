@@ -1,6 +1,6 @@
-const parts = Bun.argv.map(Number).filter(Number.isInteger);
-const test = Bun.argv.includes('test');
+export const test = Bun.argv.includes('test');
 const benchmark = Bun.argv.includes('benchmark');
+const parts = Bun.argv.map(Number).filter(Number.isInteger);
 
 export async function run<T>(readInput: () => Promise<T>, fns: ((input: NoInfer<T>) => number)[]) {
   if (parts.length) {
@@ -98,4 +98,8 @@ export function memoize<T extends (...args: any) => any>(fn: T) {
 
     return value;
   };
+}
+
+export function mod(a: number, b: number) {
+  return ((a % b) + b) % b;
 }
