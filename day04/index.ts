@@ -1,17 +1,15 @@
 import { readGrid, run } from '../utils.ts';
 
 function makeGrid(input: string[][], word: string) {
-  const length = word.length;
-  const grid = input.map((line) => line.slice());
-  const width = grid[0].length;
-  const height = grid.length;
+  const width = input[0].length;
+  const height = input.length;
 
   const search = (x: number, y: number, axis: string, backwards: boolean) => {
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < word.length; i++) {
       const currentX = axis !== 'y' ? x + (backwards ? -i : i) : x;
       const currentY = axis !== 'x' ? y + ((axis === 'y' && backwards) || axis === 'u' ? -i : i) : y;
 
-      if (grid[currentY]?.[currentX] !== word[i]) {
+      if (input[currentY]?.[currentX] !== word[i]) {
         return false;
       }
     }
