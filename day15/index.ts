@@ -1,62 +1,43 @@
 import { readLines, run } from '../utils.ts';
+import { each, equals, find, get, offset, type Position, set } from '../grid.ts';
 
-type Position = [number, number];
-type Direction = '^' | '>' | 'v' | '<';
-const directions: Record<Direction, Position> = {
-  '^': [0, -1],
-  '>': [1, 0],
-  v: [0, 1],
-  '<': [-1, 0]
+const moves = ['^', '>', 'v', '<'];
+const mapping: Record<string, string> = {
+  '.': '..',
+  '@': '@.',
+  '#': '##',
+  O: '[]'
 };
+
+type Movement = { current: Position; next: Position; value: string };
 
 function simulate(wide: boolean) {
   return (input: string[]) => {
     const halfway = input.indexOf('');
-    const grid = input.slice(0, halfway).map((line) =>
-      line.split('').flatMap((entity) => {
-        if (!wide) {
-          return entity;
-        }
+    const grid = input
+      .slice(0, halfway)
+      .map((line) => line.split('').flatMap((entity) => (wide ? mapping[entity].split('') : entity)));
+    const actions = input.slice(halfway + 1).join('');
 
-        if (entity === '@') {
-          return ['@', '.'];
-        }
-
-        if (entity === 'O') {
-          return ['[', ']'];
-        }
-
-        return [entity, entity];
-      })
-    );
-    const moves = input.slice(halfway + 1).join('');
-
-    const check = (
-      x: number,
-      y: number,
-      direction: Direction,
-      checked: [Position, Position, string][]
-    ): [Position, Position, string][] | undefined => {
-      const [offsetX, offsetY] = directions[direction];
-      const newX = x + offsetX;
-      const newY = y + offsetY;
-      const collision = grid[newY][newX];
+    const backtrack = (position: Position, direction: number, checked: Movement[]): Movement[] | undefined => {
+      const newPosition = offset(position, direction);
+      const collision = get(grid, newPosition);
 
       if (collision === '#') {
         return;
       }
 
-      let children = collision !== '.' ? check(newX, newY, direction, checked) : checked;
+      let children = collision !== '.' ? backtrack(newPosition, direction, checked) : checked;
 
       if (!children) {
         return;
       }
 
-      if (direction === '^' || direction === 'v') {
-        const offset = collision === '[' ? 1 : collision === ']' ? -1 : 0;
+      if (direction === 0 || direction === 2) {
+        const dir = collision === '[' ? 1 : collision === ']' ? 3 : 0;
 
-        if (offset) {
-          const checked = check(newX + offset, newY, direction, []);
+        if (dir) {
+          const checked = backtrack(offset(newPosition, dir), direction, []);
 
           if (!checked) {
             return;
@@ -66,39 +47,43 @@ function simulate(wide: boolean) {
         }
       }
 
-      return [...children, [[x, y], [newX, newY], grid[y][x]]];
+      return [...children, { current: position, next: newPosition, value: get(grid, position) ?? '' }];
     };
 
-    for (let i = 0; i < moves.length; i++) {
-      const direction = moves[i] as Direction;
-      const y = grid.findIndex((line) => line.includes('@'));
-      const x = grid[y].indexOf('@');
-      const move = check(x, y, direction, []);
+    for (let i = 0; i < actions.length; i++) {
+      const action = actions[i];
+      const position = find(grid, '@');
+
+      if (!position) {
+        continue;
+      }
+
+      const move = backtrack(position, moves.indexOf(action), []);
 
       if (move) {
         for (let j = 0; j < move.length; j++) {
-          const [, next, value] = move[j];
+          const { next, value } = move[j];
 
-          grid[next[1]][next[0]] = value;
+          set(grid, next, value);
         }
 
-        const clear = move.filter((m) => !move.some((n) => m[0][0] === n[1][0] && m[0][1] === n[1][1]));
+        const clear = move.filter((m) => !move.some((n) => equals(m.current, n.next)));
 
-        for (const [[oldX, oldY]] of clear) {
-          grid[oldY][oldX] = '.';
+        for (const { current } of clear) {
+          set(grid, current, '.');
         }
       }
     }
 
     let result = 0;
 
-    for (let x = 0; x < grid[0].length; x++) {
-      for (let y = 0; y < grid.length; y++) {
-        if (grid[y][x] === 'O' || grid[y][x] === '[') {
-          result += x + y * 100;
-        }
+    each(grid, (position) => {
+      const value = get(grid, position);
+
+      if (value === 'O' || value === '[') {
+        result += position.x + position.y * 100;
       }
-    }
+    });
 
     return result;
   };
