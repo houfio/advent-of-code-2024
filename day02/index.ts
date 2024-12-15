@@ -1,37 +1,27 @@
 import { readNumberGrid, run } from '../utils.ts';
 
-function calculateSafe(dampener: boolean) {
+function countSafe(dampener: boolean) {
   return (input: number[][]) => {
-    const isSafe = (data: number[]) => {
-      let increasing = true;
-      let decreasing = true;
-      let jump = true;
+    const safe = (data: number[]) => {
+      const positive = data[1] - data[0] > 0;
 
-      for (let i = 1; i < data.length; i++) {
-        const current = data[i];
-        const previous = data[i - 1];
+      return data.slice(1).every((value, index) => {
+        const diff = value - data[index];
+        const abs = Math.abs(diff);
 
-        increasing &&= current > previous;
-        decreasing &&= current < previous;
-        jump &&= Math.abs(current - previous) < 4;
-
-        if ((!increasing && !decreasing) || !jump) {
-          return false;
-        }
-      }
-
-      return true;
+        return diff > 0 === positive && abs > 0 && abs < 4;
+      });
     };
 
     const filtered = input.filter((data) => {
-      if (isSafe(data)) {
-        return true;
+      if (!dampener) {
+        return safe(data);
       }
 
       for (let i = 0; i < data.length; i++) {
         const sliced = [...data.slice(0, i), ...data.slice(i + 1, data.length)];
 
-        if (isSafe(sliced) && dampener) {
+        if (safe(sliced)) {
           return true;
         }
       }
@@ -43,4 +33,4 @@ function calculateSafe(dampener: boolean) {
   };
 }
 
-await run(() => readNumberGrid(' '), [calculateSafe(false), calculateSafe(true)]);
+await run(() => readNumberGrid(' '), [countSafe(false), countSafe(true)]);
