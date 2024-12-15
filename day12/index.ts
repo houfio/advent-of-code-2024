@@ -1,28 +1,22 @@
 import { readGrid, run } from '../utils.ts';
+import { add, directions, each, equals, get, type Grid, type Position } from '../grid.ts';
 
-type Position = [number, number];
-const directions: Position[] = [
-  [0, -1],
-  [1, 0],
-  [0, 1],
-  [-1, 0]
-];
 const corners: Position[] = [
-  [3, 0],
-  [1, 0],
-  [1, 2],
-  [3, 2]
+  { x: 3, y: 0 },
+  { x: 1, y: 0 },
+  { x: 1, y: 2 },
+  { x: 3, y: 2 }
 ];
 
 function countSides(distinct: boolean) {
-  return (input: string[][]) => {
+  return (input: Grid<string>) => {
     const visited = new Set<string>();
     let result = 0;
 
-    const backtrack = (x: number, y: number, wanted: string, parents: Position[]): [number, number] => {
-      const key = `${x}-${y}`;
+    const backtrack = (position: Position, wanted: string, parents: Position[]): [number, number] => {
+      const key = `${position.x}-${position.y}`;
 
-      if (input[y]?.[x] !== wanted) {
+      if (get(input, position) !== wanted) {
         return [0, distinct ? 0 : 1];
       }
 
@@ -32,7 +26,7 @@ function countSides(distinct: boolean) {
 
       visited.add(key);
 
-      const next = directions.map(([oX, oY]) => backtrack(x + oX, y + oY, wanted, [...parents, [x, y]]));
+      const next = directions.map((direction) => backtrack(add(position, direction), wanted, [...parents, position]));
       const area = next.reduce((previous, current) => previous + current[0], 0);
       const edges = next.reduce((previous, current) => previous + current[1], 0);
       const found = corners.filter((corner) => {
@@ -40,15 +34,15 @@ function countSides(distinct: boolean) {
           return false;
         }
 
-        const [hX, hY] = directions[corner[0]];
-        const [vX, vY] = directions[corner[1]];
+        const horizontal = directions[corner.x];
+        const vertical = directions[corner.y];
         const adjacent = [
-          [x + hX, y + vY],
-          [x + hX, y + hY],
-          [x + vX, y + vY]
-        ].map(([aX, aY]) => ({
-          seen: parents.some(([pX, pY]) => pX === aX && pY === aY),
-          matches: input[aY]?.[aX] === wanted
+          add(position, { x: horizontal.x, y: vertical.y }),
+          add(position, horizontal),
+          add(position, vertical)
+        ].map((pos) => ({
+          seen: parents.some((p) => equals(pos, p)),
+          matches: get(input, pos) === wanted
         }));
         const sameGroup = adjacent.filter((tile) => tile.matches).length;
 
@@ -62,13 +56,11 @@ function countSides(distinct: boolean) {
       return [area + 1, edges + found.length];
     };
 
-    for (let x = 0; x < input[0].length; x++) {
-      for (let y = 0; y < input.length; y++) {
-        const [area, edges] = backtrack(x, y, input[y][x], []);
+    each(input, (position) => {
+      const [area, edges] = backtrack(position, get(input, position) ?? '', []);
 
-        result += area * edges;
-      }
-    }
+      result += area * edges;
+    });
 
     return result;
   };

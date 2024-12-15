@@ -5,19 +5,12 @@ export type Size = { width: number; height: number };
 export type PositionOrNumber = Position | number;
 export type Grid<T> = T[][];
 
-export enum Direction {
-  North = 0,
-  East = 1,
-  South = 2,
-  West = 3
-}
-
-export const offsets: Record<Direction, Position> = {
-  [Direction.North]: { x: 0, y: -1 },
-  [Direction.East]: { x: 1, y: 0 },
-  [Direction.South]: { x: 0, y: 1 },
-  [Direction.West]: { x: -1, y: 0 }
-};
+export const directions: Position[] = [
+  { x: 0, y: -1 },
+  { x: 1, y: 0 },
+  { x: 0, y: 1 },
+  { x: -1, y: 0 }
+];
 
 export function find<T>(grid: Grid<T>, value: T): Position | undefined {
   const y = grid.findIndex((line) => line.includes(value));
@@ -54,6 +47,10 @@ export function add(a: Position, b: PositionOrNumber): Position {
   return { x: a.x + b.x, y: a.y + b.y };
 }
 
+export function sub(a: Position, b: PositionOrNumber): Position {
+  return add(a, invert(b));
+}
+
 export function mul(a: Position, b: PositionOrNumber): Position {
   b = pos(b);
 
@@ -76,16 +73,16 @@ export function invert(position: PositionOrNumber): PositionOrNumber {
   return { x: position.x * -1, y: position.y * -1 };
 }
 
-export function offset(position: Position, direction: Direction, amount = 1): Position {
-  return add(position, mul(offsets[direction], amount));
+export function offset(position: Position, direction: number, amount = 1): Position {
+  return add(position, mul(directions[direction], amount));
 }
 
-export function next(direction: Direction): Direction {
-  return mod(direction + 1, Direction.West);
+export function next(direction: number): number {
+  return mod(direction + 1, directions.length);
 }
 
-export function opposite(direction: Direction): Direction {
-  return mod(direction + 2, Direction.West);
+export function opposite(direction: number): number {
+  return mod(direction + 2, directions.length);
 }
 
 export function equals(a: Position, b: Position): boolean {
@@ -117,5 +114,7 @@ export function copy<T>(grid: Grid<T>): Grid<T> {
 }
 
 export function create<T>(width: number, height: number, value: T): Grid<T> {
-  return Array(height).fill(undefined).map(() => Array(width).fill(value));
+  return Array(height)
+    .fill(undefined)
+    .map(() => Array(width).fill(value));
 }

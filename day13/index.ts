@@ -1,6 +1,5 @@
 import { readLines, run } from '../utils.ts';
-
-type Position = [number, number];
+import { add, type Position } from '../grid.ts';
 
 function countCost(offset: number) {
   return (input: string[]) => {
@@ -8,7 +7,7 @@ function countCost(offset: number) {
       const split = current.indexOf(':');
       const comma = current.indexOf(',');
 
-      previous.push([Number(current.slice(split + 4, comma)), Number(current.slice(comma + 4))]);
+      previous.push({ x: Number(current.slice(split + 4, comma)), y: Number(current.slice(comma + 4)) });
 
       return previous;
     }, []);
@@ -18,13 +17,10 @@ function countCost(offset: number) {
     for (let i = 0; i < positions.length / 3; i++) {
       const a = positions[i * 3];
       const b = positions[i * 3 + 1];
-      const target = positions[i * 3 + 2];
+      const target = add(positions[i * 3 + 2], offset);
 
-      target[0] += offset;
-      target[1] += offset;
-
-      const countB = (target[1] * a[0] - target[0] * a[1]) / (b[1] * a[0] - b[0] * a[1]);
-      const countA = (target[0] - countB * b[0]) / a[0];
+      const countB = (target.y * a.x - target.x * a.y) / (b.y * a.x - b.x * a.y);
+      const countA = (target.x - countB * b.x) / a.x;
 
       if (countB % 1 === 0 && countA % 1 === 0) {
         result += countA * 3 + countB;
