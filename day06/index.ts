@@ -1,69 +1,60 @@
+import { type Grid, copy, each, find, get, next, offset, set } from '../grid.ts';
 import { readGrid, run } from '../utils.ts';
 
-const directions = [
-  [0, -1],
-  [1, 0],
-  [0, 1],
-  [-1, 0]
-];
+function followPath(start: string, grid: Grid<string | number>) {
+  let position = find(grid, start);
 
-function followPath(start: string, grid: (string | number)[][]) {
-  let y = grid.findIndex((line) => line.includes(start));
-  let x = grid[y].indexOf(start);
+  if (!position) {
+    return;
+  }
+
   let direction = 0;
-  let nextTile: string | number;
+  let nextTile: string | number | undefined;
   let walked = 0;
 
   do {
-    if (typeof grid[y][x] !== 'number') {
+    const value = get(grid, position);
+    const nextPosition = offset(position, direction);
+
+    if (typeof value !== 'number') {
       walked++;
-      grid[y][x] = direction;
-    } else if (grid[y][x] === direction) {
+      set(grid, position, direction);
+    } else if (value === direction) {
       return;
     }
 
-    const [offsetX, offsetY] = directions[direction];
-
-    nextTile = grid[y + offsetY]?.[x + offsetX];
+    nextTile = get(grid, nextPosition);
 
     if (nextTile === '#') {
-      direction = ++direction % directions.length;
+      direction = next(direction);
     } else {
-      x += offsetX;
-      y += offsetY;
+      position = nextPosition;
     }
   } while (nextTile !== undefined);
 
   return walked;
 }
 
-function calculateVisited(input: string[][]) {
-  return (
-    followPath(
-      '^',
-      input.map((row) => row.slice())
-    ) ?? 0
-  );
+function calculateVisited(input: Grid<string>) {
+  return followPath('^', copy(input)) ?? 0;
 }
 
-function calculateLoops(input: string[][]) {
+function calculateLoops(input: Grid<string>) {
   let result = 0;
 
-  for (let y = 0; y < input.length; y++) {
-    for (let x = 0; x < input[y].length; x++) {
-      if (input[y][x] !== '.') {
-        continue;
-      }
-
-      const newGrid = input.map((row) => row.slice());
-
-      newGrid[y][x] = '#';
-
-      if (!followPath('^', newGrid)) {
-        result++;
-      }
+  each(input, (pos) => {
+    if (get(input, pos) !== '.') {
+      return;
     }
-  }
+
+    const grid = copy(input);
+
+    set(grid, pos, '#');
+
+    if (!followPath('^', grid)) {
+      result++;
+    }
+  });
 
   return result;
 }

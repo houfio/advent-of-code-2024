@@ -1,42 +1,25 @@
 import { readGrid, run } from '../utils.ts';
-
-type Location = [number, number];
-
-function add(source: Location, offset: Location) {
-  return [source[0] + offset[0], source[1] + offset[1]] satisfies Location;
-}
-
-function sub(source: Location, offset: Location) {
-  return add(source, [-offset[0], -offset[1]]);
-}
-
-function inBounds(source: Location, width: number, height: number) {
-  return source[0] >= 0 && source[0] < width && source[1] >= 0 && source[1] < height;
-}
+import { add, copy, each, get, type Grid, mul, type Position, set, sub, within } from '../grid.ts';
 
 function calculateNodes(repeat: boolean) {
-  return (input: string[][]) => {
-    const grid = input.map((line) => line.slice());
-    const antennas: Record<string, Location[]> = {};
-    const width = input[0].length;
-    const height = input.length;
+  return (input: Grid<string>) => {
+    const grid = copy(input);
+    const antennas: Record<string, Position[]> = {};
     let result = 0;
 
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const character = input[y][x];
+    each(grid, (position) => {
+      const character = get(grid, position);
 
-        if (character === '.') {
-          continue;
-        }
-
-        antennas[character] ??= [];
-        antennas[character].push([x, y]);
+      if (!character || character === '.') {
+        return;
       }
-    }
+
+      antennas[character] ??= [];
+      antennas[character].push(position);
+    });
 
     for (const [, locations] of Object.entries(antennas)) {
-      const parsed = new Set<Location>();
+      const parsed = new Set<Position>();
 
       for (const location of locations) {
         for (const target of locations) {
@@ -44,29 +27,25 @@ function calculateNodes(repeat: boolean) {
             continue;
           }
 
-          const results: Location[] = [];
+          const results: Position[] = [];
           const offset = sub(location, target);
 
           if (repeat) {
-            for (let loc = location; inBounds(loc, width, height); loc = add(loc, offset)) {
-              results.push(loc);
+            for (let pos = location; within(grid, pos); pos = add(pos, offset)) {
+              results.push(pos);
             }
 
-            for (let loc = location; inBounds(loc, width, height); loc = sub(loc, offset)) {
-              results.push(loc);
+            for (let pos = location; within(grid, pos); pos = sub(pos, offset)) {
+              results.push(pos);
             }
           } else {
-            const nodes = [add(location, offset), sub(sub(location, offset), offset)].filter((loc) =>
-              inBounds(loc, width, height)
-            );
-
-            results.push(...nodes);
+            results.push(...[add(location, offset), sub(location, mul(offset, 2))].filter((pos) => within(grid, pos)));
           }
 
-          for (const [x, y] of results) {
-            if (grid[y][x] !== '#') {
+          for (const pos of results) {
+            if (get(grid, pos) !== '#') {
               result++;
-              grid[y][x] = '#';
+              set(grid, pos, '#');
             }
           }
         }
