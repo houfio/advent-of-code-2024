@@ -18,15 +18,7 @@ function countSafe(dampener: boolean) {
         return safe(data);
       }
 
-      for (let i = 0; i < data.length; i++) {
-        const sliced = [...data.slice(0, i), ...data.slice(i + 1, data.length)];
-
-        if (safe(sliced)) {
-          return true;
-        }
-      }
-
-      return false;
+      return data.some((_, i) => safe([...data.slice(0, i), ...data.slice(i + 1, data.length)]));
     });
 
     return filtered.length;
