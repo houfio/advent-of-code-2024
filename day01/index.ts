@@ -12,7 +12,7 @@ function calculateResult(similarity: boolean) {
     const scores = left.map((l) => right.filter((r) => r === l).length * l);
 
     return scores.reduce((previous, current) => previous + current, 0);
-  }
+  };
 }
 
 await run(() => readNumberGrid('   '), [calculateResult(false), calculateResult(true)]);
