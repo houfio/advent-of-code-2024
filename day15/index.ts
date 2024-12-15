@@ -31,7 +31,12 @@ function simulate(wide: boolean) {
     );
     const moves = input.slice(halfway + 1).join('');
 
-    const check = (x: number, y: number, direction: Direction, checked: [Position, Position, string][]): [Position, Position, string][] | undefined => {
+    const check = (
+      x: number,
+      y: number,
+      direction: Direction,
+      checked: [Position, Position, string][]
+    ): [Position, Position, string][] | undefined => {
       const [offsetX, offsetY] = directions[direction];
       const newX = x + offsetX;
       const newY = y + offsetY;
@@ -77,8 +82,7 @@ function simulate(wide: boolean) {
           grid[next[1]][next[0]] = value;
         }
 
-        const clear = move
-          .filter((m) => !move.some((n) => m[0][0] === n[1][0] && m[0][1] === n[1][1]));
+        const clear = move.filter((m) => !move.some((n) => m[0][0] === n[1][0] && m[0][1] === n[1][1]));
 
         for (const [[oldX, oldY]] of clear) {
           grid[oldY][oldX] = '.';

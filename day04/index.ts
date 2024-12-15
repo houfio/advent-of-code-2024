@@ -1,8 +1,8 @@
-import { readLines, run } from '../utils.ts';
+import { readGrid, run } from '../utils.ts';
 
-function makeGrid(input: string[], word: string) {
+function makeGrid(input: string[][], word: string) {
   const length = word.length;
-  const grid = input.map((line) => line.split(''));
+  const grid = input.map((line) => line.slice());
   const width = grid[0].length;
   const height = grid.length;
 
@@ -27,7 +27,7 @@ function makeGrid(input: string[], word: string) {
   return [sumForEach, search] as const;
 }
 
-function searchWord(input: string[]) {
+function searchWord(input: string[][]) {
   const [sumForEach, search] = makeGrid(input, 'XMAS');
 
   return sumForEach((x, y) => {
@@ -46,7 +46,7 @@ function searchWord(input: string[]) {
   });
 }
 
-function searchXmark(input: string[]) {
+function searchXmark(input: string[][]) {
   const [sumForEach, search] = makeGrid(input, 'MAS');
 
   return sumForEach((x, y) => {
@@ -61,4 +61,4 @@ function searchXmark(input: string[]) {
   });
 }
 
-await run(readLines, [searchWord, searchXmark]);
+await run(readGrid, [searchWord, searchXmark]);
