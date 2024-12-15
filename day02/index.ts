@@ -18,7 +18,7 @@ function countSafe(dampener: boolean) {
         return safe(data);
       }
 
-      return data.some((_, i) => safe([...data.slice(0, i), ...data.slice(i + 1, data.length)]));
+      return data.some((_, i) => safe([...data.slice(0, i), ...data.slice(i + 1)]));
     });
 
     return filtered.length;
