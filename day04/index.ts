@@ -1,62 +1,53 @@
+import { type Grid, type Position, add, each, get } from '../grid.ts';
 import { readGrid, run } from '../utils.ts';
 
-function makeGrid(input: string[][], word: string) {
-  const width = input[0].length;
-  const height = input.length;
+function findWord(word: string, xmark: boolean) {
+  return (input: Grid<string>) => {
+    const array = [...word];
+    const find = (position: Position, axis: string, backwards: boolean) =>
+      array.every((letter, i) => {
+        const pos = add(position, {
+          x: axis !== 'y' ? (backwards ? -i : i) : 0,
+          y: axis !== 'x' ? ((axis === 'y' && backwards) || axis === 'u' ? -i : i) : 0
+        });
 
-  const search = (x: number, y: number, axis: string, backwards: boolean) => {
-    for (let i = 0; i < word.length; i++) {
-      const currentX = axis !== 'y' ? x + (backwards ? -i : i) : x;
-      const currentY = axis !== 'x' ? y + ((axis === 'y' && backwards) || axis === 'u' ? -i : i) : y;
+        return get(input, pos) === letter;
+      });
 
-      if (input[currentY]?.[currentX] !== word[i]) {
-        return false;
+    const middle = Math.floor(word.length / 2);
+    const anchor = word[xmark ? middle : 0];
+    let result = 0;
+
+    each(input, (position) => {
+      if (get(input, position) !== anchor) {
+        return;
       }
-    }
 
-    return true;
+      const results = (
+        xmark
+          ? [
+              find(add(position, { x: -middle, y: middle }), 'u', false),
+              find(add(position, middle), 'u', true),
+              find(add(position, -middle), 'd', false),
+              find(add(position, { x: middle, y: -middle }), 'd', true)
+            ]
+          : [
+              find(position, 'x', false),
+              find(position, 'x', true),
+              find(position, 'y', false),
+              find(position, 'y', true),
+              find(position, 'u', false),
+              find(position, 'u', true),
+              find(position, 'd', false),
+              find(position, 'd', true)
+            ]
+      ).filter(Boolean);
+
+      result += xmark ? (results.length > 1 ? 1 : 0) : results.length;
+    });
+
+    return result;
   };
-
-  const sumForEach = (fn: (x: number, y: number) => number) =>
-    Array(width * height)
-      .fill(undefined)
-      .reduce<number>((previous, _, index) => previous + fn(index % width, Math.floor(index / width)), 0);
-
-  return [sumForEach, search] as const;
 }
 
-function searchWord(input: string[][]) {
-  const [sumForEach, search] = makeGrid(input, 'XMAS');
-
-  return sumForEach((x, y) => {
-    const results = [
-      search(x, y, 'x', false),
-      search(x, y, 'x', true),
-      search(x, y, 'y', false),
-      search(x, y, 'y', true),
-      search(x, y, 'u', false),
-      search(x, y, 'u', true),
-      search(x, y, 'd', false),
-      search(x, y, 'd', true)
-    ].filter(Boolean);
-
-    return results.length;
-  });
-}
-
-function searchXmark(input: string[][]) {
-  const [sumForEach, search] = makeGrid(input, 'MAS');
-
-  return sumForEach((x, y) => {
-    const results = [
-      search(x - 1, y + 1, 'u', false),
-      search(x + 1, y + 1, 'u', true),
-      search(x - 1, y - 1, 'd', false),
-      search(x + 1, y - 1, 'd', true)
-    ].filter(Boolean);
-
-    return results.length > 1 ? 1 : 0;
-  });
-}
-
-await run(readGrid, [searchWord, searchXmark]);
+await run(readGrid, [findWord('XMAS', false), findWord('MAS', true)]);

@@ -1,3 +1,5 @@
+import type { Grid } from './grid.ts';
+
 export const test = Bun.argv.includes('test');
 const benchmark = Bun.argv.includes('benchmark');
 const parts = Bun.argv.map(Number).filter(Number.isInteger);
@@ -73,13 +75,13 @@ export async function readNumbers(split: string | RegExp = '') {
 export async function readGrid(split: string | RegExp = '') {
   const lines = await readLines();
 
-  return lines.map((line) => line.split(split));
+  return lines.map((line) => line.split(split)) as Grid<string>;
 }
 
 export async function readNumberGrid(split: string | RegExp = '') {
   const lines = await readLines();
 
-  return lines.map((line) => line.split(split).map(Number));
+  return lines.map((line) => line.split(split).map(Number)) as Grid<number>;
 }
 
 export function memoize<T extends (...args: any) => any>(fn: T) {
