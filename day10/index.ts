@@ -1,5 +1,5 @@
+import { type Grid, type Position, add, directions, each, get } from '../grid.ts';
 import { readNumberGrid, run } from '../utils.ts';
-import { add, directions, each, get, type Grid, type Position } from '../grid.ts';
 
 function countPaths(unique: boolean) {
   return (input: Grid<number>) => {

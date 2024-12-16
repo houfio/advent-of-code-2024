@@ -1,5 +1,5 @@
+import { type Grid, type Position, add, copy, each, get, mul, set, sub, within } from '../grid.ts';
 import { readGrid, run } from '../utils.ts';
-import { add, copy, each, get, type Grid, mul, type Position, set, sub, within } from '../grid.ts';
 
 function calculateNodes(repeat: boolean) {
   return (input: Grid<string>) => {

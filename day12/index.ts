@@ -1,5 +1,5 @@
+import { type Grid, type Position, add, directions, each, equals, get } from '../grid.ts';
 import { readGrid, run } from '../utils.ts';
-import { add, directions, each, equals, get, type Grid, type Position } from '../grid.ts';
 
 const corners: Position[] = [
   { x: 3, y: 0 },

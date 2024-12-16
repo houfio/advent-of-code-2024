@@ -1,5 +1,5 @@
+import { type Position, add } from '../grid.ts';
 import { readLines, run } from '../utils.ts';
-import { add, type Position } from '../grid.ts';
 
 function countCost(offset: number) {
   return (input: string[]) => {
