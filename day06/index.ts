@@ -1,14 +1,14 @@
-import { type Grid, copy, each, find, get, next, offset, set } from '../grid.ts';
+import { type Direction, type Grid, copy, each, find, get, next, offset, set } from '../grid.ts';
 import { readGrid, run } from '../utils.ts';
 
-function followPath(start: string, grid: Grid<string | number>) {
+function followPath(start: string, grid: Grid<string | Direction>) {
   let position = find(grid, start);
 
   if (!position) {
     return;
   }
 
-  let direction = 0;
+  let direction: Direction = 0;
   let nextTile: string | number | undefined;
   let walked = 0;
 

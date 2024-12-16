@@ -1,4 +1,4 @@
-import { type Position, each, find, get, offset, set } from '../grid.ts';
+import { type Direction, type Position, each, find, get, offset, set } from '../grid.ts';
 import { readLines, run } from '../utils.ts';
 
 const moves = ['^', '>', 'v', '<'];
@@ -17,7 +17,7 @@ function simulate(wide: boolean) {
       .map((line) => line.split('').flatMap((entity) => (wide ? mapping[entity].split('') : entity)));
     const actions = input.slice(halfway + 1).join('');
 
-    const backtrack = (position: Position, direction: number, move: boolean): boolean => {
+    const backtrack = (position: Position, direction: Direction, move: boolean): boolean => {
       const newPosition = offset(position, direction);
       const collision = get(grid, newPosition);
 
@@ -48,7 +48,7 @@ function simulate(wide: boolean) {
     };
 
     for (let i = 0; i < actions.length; i++) {
-      const direction = moves.indexOf(actions[i]);
+      const direction = moves.indexOf(actions[i]) as Direction;
       const position = find(grid, '@');
 
       if (!position) {
