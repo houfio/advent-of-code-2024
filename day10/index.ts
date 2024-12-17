@@ -1,4 +1,4 @@
-import { type Grid, type Position, add, directions, each, get } from '../grid.ts';
+import { type Grid, type Position, add, directions, each, get, stringify } from '../grid.ts';
 import { readNumberGrid, run } from '../utils.ts';
 
 function countPaths(unique: boolean) {
@@ -9,7 +9,7 @@ function countPaths(unique: boolean) {
       }
 
       if (index === 9) {
-        return [`${position.x}-${position.y}`];
+        return [stringify(position)];
       }
 
       return directions.flatMap((direction) => backtrack(add(position, direction), index + 1));

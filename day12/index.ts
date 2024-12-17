@@ -1,4 +1,4 @@
-import { type Grid, type Position, add, directions, each, equals, get } from '../grid.ts';
+import { type Grid, type Position, add, directions, each, equals, get, stringify } from '../grid.ts';
 import { readGrid, run } from '../utils.ts';
 
 const corners: Position[] = [
@@ -14,11 +14,11 @@ function countSides(distinct: boolean) {
     let result = 0;
 
     const backtrack = (position: Position, wanted: string, parents: Position[]): [number, number] => {
-      const key = `${position.x}-${position.y}`;
-
       if (get(input, position) !== wanted) {
         return [0, distinct ? 0 : 1];
       }
+
+      const key = stringify(position);
 
       if (visited.has(key)) {
         return [0, 0];

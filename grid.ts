@@ -83,6 +83,10 @@ export function next(direction: Direction) {
   return mod(direction + 1, directions.length) as Direction;
 }
 
+export function previous(direction: Direction) {
+  return mod(direction - 1, directions.length) as Direction;
+}
+
 export function opposite(direction: Direction) {
   return mod(direction + 2, directions.length) as Direction;
 }
@@ -113,4 +117,12 @@ export function within(grid: Grid<unknown>, position: Position) {
 
 export function copy<T>(grid: Grid<T>) {
   return grid.map((row) => row.slice()) satisfies Grid<T>;
+}
+
+export function stringify(gridOrPosition: Grid<unknown> | Position) {
+  if (!Array.isArray(gridOrPosition)) {
+    return `${gridOrPosition.x}-${gridOrPosition.y}`;
+  }
+
+  return gridOrPosition.map((row) => row.join('')).join('\n');
 }
