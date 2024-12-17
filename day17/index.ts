@@ -12,10 +12,10 @@ function execute(find: boolean) {
 
         switch (instruction) {
           case 0:
-            register[0] = register[0] / 2n ** combo;
+            register[0] /= 2n ** combo;
             break;
           case 1:
-            register[1] = register[1] ^ BigInt(literal);
+            register[1] ^= BigInt(literal);
             break;
           case 2:
             register[1] = combo % 8n;
@@ -24,7 +24,7 @@ function execute(find: boolean) {
             pointer = register[0] ? literal - 2 : pointer;
             break;
           case 4:
-            register[1] = register[1] ^ register[2];
+            register[1] ^= register[2];
             break;
           case 5:
             output.push(Number(combo % 8n));
