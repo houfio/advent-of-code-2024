@@ -4,7 +4,7 @@ export const test = Bun.argv.includes('test');
 const benchmark = Bun.argv.includes('benchmark');
 const parts = Bun.argv.map(Number).filter(Number.isInteger);
 
-export async function run<T>(readInput: () => Promise<T>, fns: ((input: NoInfer<T>) => number)[]) {
+export async function run<T>(readInput: () => Promise<T>, fns: ((input: NoInfer<T>) => number | string)[]) {
   if (parts.length) {
     fns = fns.filter((_, i) => parts.includes(i + 1));
   }
@@ -12,7 +12,7 @@ export async function run<T>(readInput: () => Promise<T>, fns: ((input: NoInfer<
   const input = await readInput();
 
   for (const fn of fns) {
-    let result: number;
+    let result: number | string;
     const { done, end, log } = bench();
 
     do {
