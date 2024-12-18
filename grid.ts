@@ -119,6 +119,12 @@ export function copy<T>(grid: Grid<T>) {
   return grid.map((row) => row.slice()) satisfies Grid<T>;
 }
 
+export function make<T>(size: Size, value: T) {
+  return Array(size.height)
+    .fill(undefined)
+    .map(() => Array(size.width).fill(value)) as Grid<T>;
+}
+
 export function stringify(gridOrPosition: Grid<unknown> | Position) {
   if (!Array.isArray(gridOrPosition)) {
     return `${gridOrPosition.x}-${gridOrPosition.y}`;
