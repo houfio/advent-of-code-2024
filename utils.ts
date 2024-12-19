@@ -105,3 +105,13 @@ export function memoize<T extends (...args: any) => any>(fn: T) {
 export function mod(a: number, b: number) {
   return ((a % b) + b) % b;
 }
+
+export function findFirst(min: number, max: number, fn: (value: number) => boolean): number {
+  if (min === max) {
+    return min;
+  }
+
+  const middle = Math.floor((min + max) / 2);
+
+  return fn(middle) ? findFirst(min, middle, fn) : findFirst(middle + 1, max, fn);
+}

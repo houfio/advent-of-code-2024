@@ -1,5 +1,5 @@
 import { add, directions, each, get, make, set, stringify } from '../grid.ts';
-import { readLines, run, test } from '../utils.ts';
+import { findFirst, readLines, run, test } from '../utils.ts';
 
 type Distances = Record<string, number>;
 
@@ -8,10 +8,10 @@ const bytes = test ? 12 : 1024;
 
 function findPath(simulate: boolean) {
   return (input: string[]) => {
-    const getDistance = (extra: number) => {
+    const getDistance = (amount: number) => {
       const grid = make({ width: size, height: size }, '.');
 
-      for (let i = 0; i < bytes + extra; i++) {
+      for (let i = 0; i < amount; i++) {
         const [x, y] = input[i].split(',').map(Number);
 
         set(grid, { x, y }, '#');
@@ -65,12 +65,14 @@ function findPath(simulate: boolean) {
     };
 
     if (!simulate) {
-      return getDistance(0);
+      return getDistance(bytes);
     }
 
-    const result = Array(input.length - bytes)
-      .fill(undefined)
-      .findIndex((_, i) => getDistance(i) === Number.POSITIVE_INFINITY);
+    const result = findFirst(
+      0,
+      input.length - bytes,
+      (value) => getDistance(bytes + value) === Number.POSITIVE_INFINITY
+    );
 
     return input[bytes + result - 1];
   };
