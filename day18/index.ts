@@ -1,5 +1,5 @@
-import { readLines, run, test } from '../utils.ts';
 import { add, directions, each, get, make, set, stringify } from '../grid.ts';
+import { readLines, run, test } from '../utils.ts';
 
 type Distances = Record<string, number>;
 
@@ -62,7 +62,7 @@ function findPath(simulate: boolean) {
       }
 
       return distances[stringify({ x: size - 1, y: size - 1 })];
-    }
+    };
 
     if (!simulate) {
       return getDistance(0);
@@ -73,7 +73,7 @@ function findPath(simulate: boolean) {
       .findIndex((_, i) => getDistance(i) === Number.POSITIVE_INFINITY);
 
     return input[bytes + result - 1];
-  }
+  };
 }
 
 await run(readLines, [findPath(false), findPath(true)]);

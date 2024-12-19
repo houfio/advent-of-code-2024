@@ -1,4 +1,4 @@
-import { type Direction, directions, each, find, get, type Grid, next, offset, previous, stringify } from '../grid.ts';
+import { type Direction, type Grid, directions, each, find, get, next, offset, previous, stringify } from '../grid.ts';
 import { readGrid, run } from '../utils.ts';
 
 type Distances = Record<string, number>;
@@ -80,10 +80,7 @@ function simulate(seats: boolean) {
       const current = stack[stack.length - 1];
 
       visited.add(current.slice(0, current.lastIndexOf('-')));
-      stack = [
-        ...stack.slice(0, -1),
-        ...predecessors[current] ?? []
-      ];
+      stack = [...stack.slice(0, -1), ...(predecessors[current] ?? [])];
     }
 
     return visited.size;

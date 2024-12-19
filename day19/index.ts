@@ -21,7 +21,7 @@ function findPatterns(unique: boolean) {
     });
 
     return stacks.reduce((previous, current) => previous + backtrack(current), 0);
-  }
+  };
 }
 
 await run(readLines, [findPatterns(true), findPatterns(false)]);
